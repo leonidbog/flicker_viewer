@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -79,10 +78,7 @@ class ImageDetailScreen extends StatelessWidget {
               bool hasPermission = await requestStoragePermission();
               if (hasPermission) {
                 final file = await DefaultCacheManager().getSingleFile(imageUrl);
-
-                //await saveImage(file);
-
-
+                await saveImage(file.path, context);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -109,5 +105,30 @@ class ImageDetailScreen extends StatelessWidget {
       return result.isGranted;
     }
     return status.isGranted;
+  }
+}
+
+Future<void> saveImage(String filePath, BuildContext context) async {
+  try {
+    bool? success = await GallerySaver.saveImage(filePath);
+    if (success!) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Image saved to gallery'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save image'),
+        ),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error saving image: $e'),
+      ),
+    );
   }
 }
